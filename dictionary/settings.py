@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,15 +21,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'd-)ig1@mzk(e9$n^6rpprk_@!8ak4lr18(buxm6c&yjxw$52ef'
+SECRET_KEY = config('SECRET_KEY')
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["127.0.0.1"]
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # During development only.
 
 # Application definition
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -37,6 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authentication',
+    'core',
+    'fontawesome_5',
+    'account_settings',
+    'dictionary_app',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +66,7 @@ ROOT_URLCONF = 'dictionary.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,'templates'),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,9 +86,13 @@ WSGI_APPLICATION = 'dictionary.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': '5432',
     }
 }
 
@@ -105,7 +121,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -118,3 +134,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+LOGIN_URL = '/auth/signin/'
+
+LOGOUT_URL = '/auth/signout'
+
+# API Cradentials
+API_HOST = config('API_HOST', default='')
+API_KEY = config('API_KEY', default='')

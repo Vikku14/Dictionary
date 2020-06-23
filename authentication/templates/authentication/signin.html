@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Signin {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/core/home.css' %}">
+
+{% endblock %}
+{% block content %}
+{% include 'includes/messages.html' %}
+<div class="row  d-flex align-items-center">
+  <div class="col-md-3 col-12 mx-auto mt-5">
+
+
+      <div class=" h3 mb-3 text-center">SignIn</div>
+
+      <form action="{% url 'authentication:signin'%}" method="POST" class="form">
+        {% csrf_token %}
+        <div class="form-group">
+          <!-- <label class="col-12 col-md-3 h5 align-self-center" for="id_username">Username: </label> -->
+          <input type="text" name="username" id="id_username" placeholder="Username" class="form-control form-control-lg col-12">
+        </div>
+        <div class="form-group">
+          <!-- <label class="col-12 col-md-3 h5 align-self-center" for="id_password">Password: </label> -->
+          <input type="password" name="password" id="id_password" placeholder="Password" class="form-control form-control-lg col-12">
+        </div>
+        <button type="submit" class="btn btn-success font-weight-bold btn-lg col-12 btn-block">SignIn</button>
+        <a href="{% url 'authentication:password_reset' %}" class="btn btn-link">Forgot your password?</a>
+      </form>
+
+      <div class="lead h3 my-4 text-center">Already have account?</div>
+      <a class="btn btn-primary col-12 font-weight-bold btn-lg " href="{% url 'authentication:signup' %}">SignUp</a>
+
+    </div>
+
+</div>
+
+{% block javascript %}
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% endblock %}

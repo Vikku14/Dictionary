@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Profile {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/account_settings/profile.css' %}">
+
+{% endblock %}
+{% block content %}
+{% include 'includes/messages.html' %}
+
+<div class="row p-5">
+  <div class="col-md-3 col-12">
+    {% include 'account_settings/settings_menu.html' %}
+  </div>
+  <div class="col-md-6 offset-md-1 col-12">
+    <p class="row justify-content-center h3">Edit Your Profile <span class="font-weight-bold"></p>
+    <div class="">
+
+      <form class="form container" method="post">
+        {% csrf_token %}
+
+        <!-- user form -->
+        {% for field in user_form %}
+        <div class="row form-group my-4">
+          <div class="col-md-3 col-12 lead text-muted align-items-center font-weight-bold">
+            {{ field.label_tag | title }}
+          </div>
+          <div class="col-md-8 col-12 form-control form-control-lg p-0 {% if field.errors %} error {% endif %}">
+            {{ field }}
+          </div>
+          <div class="col-12 col-md-7 offset-md-4">
+            {% for error in field.errors %}
+            <p class="text-danger"> {{ error }}</p>
+            {% endfor %}
+          </div>
+
+        </div>
+        {% endfor %}
+
+        <!-- profile form -->
+
+        {% for field in profile_form %}
+        <div class="row form-group my-4  {% if field.name in restricted_inputs %} d-none {% endif %}">
+          <div class="col-md-3 col-12 lead align-items-center text-muted font-weight-bold ">
+            {{ field.label_tag | title }}
+          </div>
+          <div class="col-md-8 col-12 form-control form-control-lg p-0 {% if field.name == 'bio' %} bio {% endif %}">
+            {{ field }}
+          </div>
+          <div class="col-12 col-md-7 offset-md-4">
+            {% for error in field.errors %}
+            <p class="text-danger"> {{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+        {{  profile_form.0 }}
+
+        <button type="submit" name="button" class="btn btn-block btn-lg btn-primary font-weight-bold">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{% block javascript %}
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script>
+  $(function() {
+    $(' #id_first_name').focus();
+  });
+  $('#id_birth_date').attr('type', 'date');
+
+</script>
+{% endblock %}
+{% endblock %}

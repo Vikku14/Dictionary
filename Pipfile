@@ -8,6 +8,9 @@ verify_ssl = true
 [packages]
 django = "*"
 psycopg2 = "*"
+python-decouple = "*"
+pillow = "*"
+django-fontawesome-5 = "*"
 
 [requires]
 python_version = "3.8"

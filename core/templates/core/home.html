@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Home {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/core/home.css' %}">
+
+{% endblock %}
+
+{% block content %}
+{% include 'includes/messages.html' %}
+<div class= "display-3 text-center d-flex align-items-center" style="height: 70%;">
+<div class="container">Welcome! to <span class="text-primary">Home </span> Page.</div>
+</div>
+{% block javascript %}
+
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+      <script>
+
+      </script>
+      {% endblock %}
+{% endblock %}

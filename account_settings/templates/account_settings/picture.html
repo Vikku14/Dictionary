@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Update Picture {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/account_settings/profile.css' %}">
+<link rel="stylesheet" href="{% static 'css/account_settings/cropper.min.css' %}" />
+ {% endblock %}
+{% block content %}
+{% include 'includes/messages.html' %}
+<div class="row p-5" >
+
+<div class="col-md-3 col-12">
+  {% include 'account_settings/settings_menu.html' %}
+</div>
+<div class="col-md-9 col-12">
+  <form class="form" id="form" method="post" action = "{% url 'account_settings:picture' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+      <div class="row text-center align-items-center">
+        <div class=" jumbotron rounded d-block mx-auto">
+        <img class=" img-fluid rounded col-md-6 col-12 " src="{{p.photo.url}}" alt="{{p.photo.url}}">
+        <div class="h6 mt-4 col-12">
+        <span class="text-muted lead">Last Updated: </span>{{ p.uploaded_at }}
+        </div>
+      <label class="btn btn-lg col-md-6 col-12  m-4 btn-primary font-weight-bold" for="id_photo">Update Picture</label>
+      <span class="d-none" >{{ form.as_p }}</span>
+    </div>
+    </div>
+</div>
+</div>
+
+<!-- MODAL TO CROP THE IMAGE -->
+<div class="modal fade" id="modalCrop">
+  <div class="modal-dialog rounded modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.7/cropper.min.js"></script>
+
+        <h4 class="modal-title">Crop the photo</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img src="" id="image">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
+        <button type="button" class="btn btn-primary js-crop">Crop and Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block javascript %}
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="{% static 'js/account_settings/cropper.min.js' %}"></script>
+<script>
+  $(function() {
+
+    // script to open the preview of image
+    $('#id_photo').change(function(e){
+      if (this.files && this.files[0]){
+        var reader = new FileReader();
+        reader.onload = function(e){
+          $('#image').attr("src", e.target.result);
+
+          $("#modalCrop").modal("show");
+        }
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+    $().cropper('getCroppedCanvas', {
+      fillColor: '#fff'
+    })
+    // script to handle cropper box
+    var $image = $("#image");
+    var cropBoxData;
+    var canvasData;
+    $("#modalCrop").on("shown.bs.modal", function(){
+      $('#image').cropper('destroy');
+      $image.cropper({
+        viewMode:2,
+        aspectRatio: 1/1,
+
+        ready: function(){
+          $image.cropper("setCanvasData", canvasData);
+          $image.cropper("setCropBoxData", cropBoxData);
+        }
+      });
+    }).on("hidden.bs.modal", function(){
+      cropBoxData = $image.cropper("getCropBoxData");
+      canvasData = $image.cropper("getCanvasData");
+      $image.cropper("distroy")
+    });
+
+    // script to collect the data
+    $(".js-crop").click(function(){
+      var cropData = $image.cropper("getData");
+      $("#id_x").val(cropData["x"]);
+      $("#id_y").val(cropData["y"]);
+      $("#id_width").val(cropData["width"]);
+      $("#id_height").val(cropData["height"]);
+      $("#form").submit();
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %}

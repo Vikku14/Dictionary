@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %} Signup {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/authentication/signup.css' %}">
+{% endblock %}
+{% block content %}
+{% include 'includes/messages.html' %}
+<div class="row d-flex align-items-center">
+  <div class="col-md-3 col-12 mt-5 mx-auto">
+    <div class="text-center h3">SignUp</div>
+
+
+    <form method="post" class="form">
+      {% csrf_token %}
+
+      {% for field in form %}
+      <div class="row">
+
+        <!-- <label class="col-md-3 h5 align-self-center" for="{{ forloop.counter }}">{{ field.label_tag }} </label> -->
+
+        <div class="col-11 form-control form-control-lg p-0 m-1" id='{{ forloop.counter }}''>
+                        {{ field }}
+        </div>
+<!--
+                    {% if forloop.first %}
+                    <div class="col-md-8 offset-md-4 col-12" >
+                        <small class="h6">(Usernames may contain <strong>alphanumeric</strong>, <strong>_</strong> and <strong>-</strong> characters)</small>
+                    </div>
+                    {% endif %} -->
+
+                </div>
+                {% endfor %}
+                <br>
+                <div class="row">
+                    <input type="submit" value="Create an Account" class="btn btn-lg btn-primary col-11 font-weight-bold">
+                </div>
+                <div class=" text-center lead  my-4 h3">
+                    New Here?
+                </div>
+                <div class="row">
+                    <a href="{% url 'authentication:signin' %}" class="btn btn-lg btn-success col-11 font-weight-bold">SignIn</a>
+                </div>
+            </form>
+
+            <!-- all error messages -->
+
+            <div class="mt-4">
+
+
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <p class="text-danger"> {{ error }}</p>
+                {% endfor %}
+              {% endfor %}
+                <!-- errors for usrname -->
+
+            </div>
+
+</div>
+
+</div>
+{% block javascript %}
+
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+      <script>
+        $(function () {
+          $(' #id_username').focus(); }); </script>
+          {% endblock %}
+          {% endblock %}
