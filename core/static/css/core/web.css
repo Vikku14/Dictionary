@@ -1,0 +1,13 @@
+#id_word{
+  width: 100%;
+  height: 100%;
+}
+html, body{
+
+  font-family: sans-serif;
+}
+.result {
+border-left: 3px solid #8396ff;
+border-top-right-radius: 2% !important;
+border-bottom-right-radius: 2% !important;
+}

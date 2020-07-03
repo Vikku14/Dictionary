@@ -1,18 +1,152 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} Website {% endblock %}
+{% block title %} Dictionary {% endblock %}
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/core/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/core/web.css' %}">
+<link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+{% endblock %}
 
+
+{% block javascript %}
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script>
+  $(document).ready(function() {
+    var availableTutorials = [];
+    $("#id_word").keyup(function() {
+      const letter = $("#id_word").val();
+      const req = new XMLHttpRequest();
+      req.open('POST', 'search');
+      req.onload = () => {
+        var data = JSON.parse(req.response);
+        list = data.data;
+        console.log(list);
+        $( "#id_word" ).autocomplete({
+           source: list,
+           minLength:2,
+        });
+
+      };
+      const data = new FormData();
+      data.append('letter', letter);
+      req.send(data);
+      // return false;
+
+    });
+  });
+</script>
 {% endblock %}
 
 {% block content %}
-<div class= "display-3 text-center d-flex align-items-center" style="height: 70%;">
 
-<div class="container">Welcome! to Website <span class="text-primary">Main </span> Page.</div>
 
+{% include 'includes/header.html' %}
+
+<form method="get" action="{% url 'core:web' %}" class="form container text-center my-5">
+  <div class="row">
+
+    <div class="form-control form-control-lg col-12  col-md-9 p-0" style="height:4rem;">
+      {{ form.word }}
     </div>
-    {% block javascript %}
-          <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-          {% endblock %}
+    <!-- <div class="col-md-1 col-12"> -->
+
+    <button type="submit" class="btn btn-block col-md-2 offset-md-1 col-12 btn-dark lead">Search</button>
+    <!-- </div> -->
+  </div>
+</form>
+
+{% if search_result %}
+{% if search_result.success %}
+<div class="container card shadow-sm  w-md-75 py-5 card-body px-5 rounded" style="background: lavender;">
+  <div class="display-4 lead">
+    {{ search_result.word | title }}
+    {% if search_result.pronunciation %}
+    <span class="ml-2 h4 text-primary">{{ search_result.pronunciation.all }}
+      <svg class="bi bi-soundwave" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd"
+          d="M8.5 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11a.5.5 0 0 1 .5-.5zm-2 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zm-6 1.5A.5.5 0 0 1 5 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm8 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm-10 1A.5.5 0 0 1 3 7v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5zm12 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5z" />
+      </svg>
+    </span>
+    {% endif %}
+  </div>
+  <span class="h6 text-muted">
+    {% for result in search_result.syllables.list %}
+    {{ result }}{% if not forloop.last %};{% endif %}
+    {% endfor %}
+  </span>
+  {% for res in search_result.results %}
+  <div class="card card-body shadow-sm p-3 my-3 bg-white rounded result">
+    <span class="h3 font-weight-bold text-dark mt-3 ml-3">{{ res.partOfSpeech | title }}</span>
+    <div class=" ml-2">
+      <span class="btn row h4 ml-md-4 text-left"> <span class="font-weight-bold lead text-dark">Defination: </span> {{ res.definition }} </span>
+    </div>
+    <hr class="mx-auto" style="background:gray; width:90%;">
+
+    {% if res.typeOf %}
+    <div class="h4 lead">Genric Words (hypernyms)</div>
+    <div class="h6 ml-2">
+      {% for typ in res.typeOf %}
+      <a href="?word={{ typ | title }}">{{ typ | title}}</a>{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+
+    {% if res.synonyms %}
+    <div class="h4 lead">Synonyms</div>
+    <div class="h6 text-dark ml-2">
+      {% for syn in res.synonyms %}
+      <a href="?word={{ syn | title }}">{{ syn | title}}</a>{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if res.antonyms %}
+    <div class="h4 lead">Antonyms</div>
+    <div class="h6 text-dark ml-2">
+      {% for ant in res.antonyms %}
+      <a href="?word={{ ant | title }}">{{ ant | title}}</a>{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if res.similarTo %}
+    <div class="h4 lead">Similar Words</div>
+    <div class="h6 text-dark ml-2">
+      {% for sim in res.similarTo %}{% if not forloop.last %},{% endif %}
+      <a href="?word={{ sim | title }}">{{ sim | title}}</a>{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    </div>
+    <link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+    {% endif %}
+
+    {% if res.derivation %}
+    <div class="h4 lead">Derivated Words</div>
+    <div class="h6 text-dark ml-2">
+      {% for der in res.derivation %}
+      <a href="?word={{ der | title }}">{{ der | title}}</a>{% if not forloop.last %},{% endif %}
+
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if res.examples %}
+    <div class="h4 lead">Examples</div>
+    <div class="h6 text-dark ml-2">
+
+      {% for ex in res.examples %}
+      {{ ex }}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="mt-5 container"><em>{{ search_result.message }}</em></p>
+{% endif %}
+{% endif %}
+
 {% endblock %}
